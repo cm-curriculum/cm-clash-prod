@@ -38,6 +38,31 @@
 			-ms-interpolation-mode: nearest-neighbor;
 		}
 	</style>
+	<script>
+		function WebGLInputCapture() {
+			var inputElements = document.querySelectorAll('input');
+			for (var i = 0; i < inputElements.length; i++) {
+				inputElements[i].addEventListener('paste', function (e) {
+					var text = e.clipboardData.getData('text');
+					e.target.value += text;
+					e.preventDefault();
+				});
+			}
+
+			var textareaElements = document.querySelectorAll('textarea');
+			for (var i = 0; i < textareaElements.length; i++) {
+				textareaElements[i].addEventListener('paste', function (e) {
+					var text = e.clipboardData.getData('text');
+					e.target.value += text;
+					e.preventDefault();
+				});
+			}
+		}
+
+		mergeInto(LibraryManager.library, {
+			WebGLInputCapture: WebGLInputCapture
+		});
+	</script>
 </head>
 
 <body>
