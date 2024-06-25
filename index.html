@@ -75,6 +75,8 @@
 		<canvas id="unity-canvas" data-pixel-art=""></canvas>
 		<script src="Build/Robot-Wars-Game.loader.js"></script>
 		<script>
+			var unityInstance = null;
+
 			var canvas = document.querySelector("#unity-canvas");
 			var config = {
 				dataUrl: "Build/Robot-Wars-Game.data",
@@ -130,7 +132,7 @@
 			}
 			createUnityInstance(canvas, config, progressHandler).then(function (instance)
 			{
-				canvas = instance.Module.canvas;
+				unityInstance = instance;
 				onResize();
 			});
 			window.addEventListener('resize', onResize);
@@ -152,7 +154,13 @@
 				navigator.clipboard.readText().then(
 					function (clipText)
 					{
-						unityInstance.SendMessage('Code Editor Manager', callbackName, clipText);
+						if (unityInstance && typeof unityInstance.SendMessage === "function")
+						{
+							unityInstance.SendMessage('Code Editor Manager', callbackName, clipText);
+						} else
+						{
+							console.error("Unity instance is not ready or not defined.");
+						}
 					},
 					function (error)
 					{
