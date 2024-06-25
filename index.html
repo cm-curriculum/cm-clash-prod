@@ -2,174 +2,153 @@
 <html lang="en-us">
 
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>CM Clash</title>
-	<style>
-		html,
-		body {
-			background: #000;
-			width: 100%;
-			height: 100%;
-			overflow: visible;
-			padding: 0;
-			margin: 0;
-		}
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>CM Clash</title>
+    <style>
+        html,
+        body {
+            background: #000;
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+            padding: 0;
+            margin: 0;
+        }
 
-		div#gameContainer {
-			background: transparent !important;
-			position: absolute;
-		}
+        div#gameContainer {
+            background: transparent !important;
+            position: absolute;
+        }
 
-		div#gameContainer canvas {
-			position: absolute;
-		}
+        div#gameContainer canvas {
+            position: absolute;
+        }
 
-		div#gameContainer canvas[data-pixel-art="true"] {
-			position: absolute;
-			image-rendering: optimizeSpeed;
-			image-rendering: -webkit-crisp-edges;
-			image-rendering: -moz-crisp-edges;
-			image-rendering: -o-crisp-edges;
-			image-rendering: crisp-edges;
-			image-rendering: -webkit-optimize-contrast;
-			image-rendering: optimize-contrast;
-			image-rendering: pixelated;
-			-ms-interpolation-mode: nearest-neighbor;
-		}
-	</style>
-	<script>
-		function WebGLInputCapture()
-		{
-			var inputElements = document.querySelectorAll('input');
-			for (var i = 0; i < inputElements.length; i++)
-			{
-				inputElements[i].addEventListener('paste', function (e)
-				{
-					var text = e.clipboardData.getData('text');
-					e.target.value += text;
-					e.preventDefault();
-				});
-			}
+        div#gameContainer canvas[data-pixel-art="true"] {
+            position: absolute;
+            image-rendering: optimizeSpeed;
+            image-rendering: -webkit-crisp-edges;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -o-crisp-edges;
+            image-rendering: crisp-edges;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: optimize-contrast;
+            image-rendering: pixelated;
+            -ms-interpolation-mode: nearest-neighbor;
+        }
+    </style>
+    <script>
+        function WebGLInputCapture() {
+            var inputElements = document.querySelectorAll('input');
+            for (var i = 0; i < inputElements.length; i++) {
+                inputElements[i].addEventListener('paste', function (e) {
+                    var text = e.clipboardData.getData('text');
+                    e.target.value += text;
+                    e.preventDefault();
+                });
+            }
 
-			var textareaElements = document.querySelectorAll('textarea');
-			for (var i = 0; i < textareaElements.length; i++)
-			{
-				textareaElements[i].addEventListener('paste', function (e)
-				{
-					var text = e.clipboardData.getData('text');
-					e.target.value += text;
-					e.preventDefault();
-				});
-			}
-		}
+            var textareaElements = document.querySelectorAll('textarea');
+            for (var i = 0; i < textareaElements.length; i++) {
+                textareaElements[i].addEventListener('paste', function (e) {
+                    var text = e.clipboardData.getData('text');
+                    e.target.value += text;
+                    e.preventDefault();
+                });
+            }
+        }
 
-		mergeInto(LibraryManager.library, {
-			WebGLInputCapture: WebGLInputCapture
-		});
-	</script>
+        mergeInto(LibraryManager.library, {
+            WebGLInputCapture: WebGLInputCapture
+        });
+    </script>
 </head>
 
 <body>
-	<div id="gameContainer">
-		<canvas id="unity-canvas" data-pixel-art=""></canvas>
-		<script src="Build/Robot-Wars-Game.loader.js"></script>
-		<script>
-			var unityInstance = null;
+    <div id="gameContainer">
+        <canvas id="unity-canvas" data-pixel-art=""></canvas>
+        <script src="Build/Robot-Wars-Game.loader.js"></script>
+        <script>
+            var unityInstance = null;
+            var canvas = document.querySelector("#unity-canvas");
+            var config = {
+                dataUrl: "Build/Robot-Wars-Game.data",
+                frameworkUrl: "Build/Robot-Wars-Game.framework.js",
+                codeUrl: "Build/Robot-Wars-Game.wasm",
+                streamingAssetsUrl: "StreamingAssets",
+                companyName: "DefaultCompany",
+                productName: "CM Clash",
+                productVersion: "1.0",
+            };
+            var scaleToFit;
+            try {
+                scaleToFit = !!JSON.parse("true");
+            } catch (e) {
+                scaleToFit = true;
+            }
+            function progressHandler(progress) {
+                var percent = progress * 100 + '%';
+                canvas.style.background = 'linear-gradient(to right, white, white ' + percent + ', transparent ' + percent + ', transparent) no-repeat center';
+                canvas.style.backgroundSize = '100% 1rem';
+            }
+            function onResize() {
+                var container = canvas.parentElement;
+                var w;
+                var h;
 
-			var canvas = document.querySelector("#unity-canvas");
-			var config = {
-				dataUrl: "Build/Robot-Wars-Game.data",
-				frameworkUrl: "Build/Robot-Wars-Game.framework.js",
-				codeUrl: "Build/Robot-Wars-Game.wasm",
-				streamingAssetsUrl: "StreamingAssets",
-				companyName: "DefaultCompany",
-				productName: "CM Clash",
-				productVersion: "1.0",
-			};
-			var scaleToFit;
-			try
-			{
-				scaleToFit = !!JSON.parse("true");
-			} catch (e)
-			{
-				scaleToFit = true;
-			}
-			function progressHandler(progress)
-			{
-				var percent = progress * 100 + '%';
-				canvas.style.background = 'linear-gradient(to right, white, white ' + percent + ', transparent ' + percent + ', transparent) no-repeat center';
-				canvas.style.backgroundSize = '100% 1rem';
-			}
-			function onResize()
-			{
-				var container = canvas.parentElement;
-				var w;
-				var h;
+                if (scaleToFit) {
+                    w = window.innerWidth;
+                    h = window.innerHeight;
 
-				if (scaleToFit)
-				{
-					w = window.innerWidth;
-					h = window.innerHeight;
+                    var r = 900 / 1600;
 
-					var r = 900 / 1600;
+                    if (w * r > window.innerHeight) {
+                        w = Math.min(w, Math.ceil(h / r));
+                    }
+                    h = Math.floor(w * r);
+                } else {
+                    w = 1600;
+                    h = 900;
+                }
 
-					if (w * r > window.innerHeight)
-					{
-						w = Math.min(w, Math.ceil(h / r));
-					}
-					h = Math.floor(w * r);
-				} else
-				{
-					w = 1600;
-					h = 900;
-				}
-
-				container.style.width = canvas.style.width = w + "px";
-				container.style.height = canvas.style.height = h + "px";
-				container.style.top = Math.floor((window.innerHeight - h) / 2) + "px";
-				container.style.left = Math.floor((window.innerWidth - w) / 2) + "px";
-			}
-			createUnityInstance(canvas, config, progressHandler).then(function (instance)
-			{
-				unityInstance = instance;
-				onResize();
-			});
-			window.addEventListener('resize', onResize);
-			onResize();
-
-			if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent))
-			{
-				// Mobile device style: fill the whole browser client area with the game canvas:
-				const meta = document.createElement('meta');
-				meta.name = 'viewport';
-				meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-				document.getElementsByTagName('head')[0].appendChild(meta);
-			}
-		</script>
-
-		<script>
-			function getClipboardData(callbackName)
-			{
-				navigator.clipboard.readText().then(
-					function (clipText)
-					{
-						if (unityInstance && typeof unityInstance.SendMessage === "function")
-						{
-							unityInstance.SendMessage('Code Editor Manager', callbackName, clipText);
-						} else
-						{
-							console.error("Unity instance is not ready or not defined.");
-						}
-					},
-					function (error)
-					{
-						console.error('Clipboard access denied', error);
-					}
-				);
-			}
-		</script>
-	</div>
+                container.style.width = canvas.style.width = w + "px";
+                container.style.height = canvas.style.height = h + "px";
+                container.style.top = Math.floor((window.innerHeight - h) / 2) + "px";
+                container.style.left = Math.floor((window.innerWidth - w) / 2) + "px";
+            }
+            createUnityInstance(canvas, config, progressHandler).then(function (instance) {
+                unityInstance = instance;
+                onResize();
+            });
+            window.addEventListener('resize', onResize);
+            onResize();
+        </script>
+        <script>
+            function getClipboardData(callbackName) {
+                navigator.clipboard.readText().then(
+                    function (clipText) {
+                        if (unityInstance && typeof unityInstance.SendMessage === "function") {
+                            unityInstance.SendMessage('Code Editor Manager', callbackName, clipText);
+                        } else {
+                            console.error("Unity instance is not ready or not defined.");
+                        }
+                    },
+                    function (error) {
+                        console.error('Clipboard access denied', error);
+                    }
+                );
+            }
+        </script>
+        <script>
+            if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                const meta = document.createElement('meta');
+                meta.name = 'viewport';
+                meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+                document.getElementsByTagName('head')[0].appendChild(meta);
+            }
+        </script>
+    </div>
 </body>
 
 </html>
