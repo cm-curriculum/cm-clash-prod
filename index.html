@@ -120,6 +120,17 @@
             createUnityInstance(canvas, config, progressHandler).then(function (instance) {
                 unityInstance = instance;
                 onResize();
+
+                window.addEventListener('beforeunload', function (e) {
+                    var gameObjectName = 'Database Manager';
+                    var unityObject = gameInstance.Module.cwrap('UnityObject', 'number', []);
+
+                    if (gameInstance && unityObject && gameInstance.Module.UTF8ToString(unityObject) === gameObjectName) {
+                        gameInstance.SendMessage(gameObjectName, 'CloseTab');
+                    } else {
+                        console.warn('GameObject does not exist or is not yet initialized.');
+                    }
+                });
             });
             window.addEventListener('resize', onResize);
             onResize();
