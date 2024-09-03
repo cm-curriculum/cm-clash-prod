@@ -121,16 +121,19 @@
                 unityInstance = instance;
                 onResize();
 
-                window.addEventListener('beforeunload', function (e) {
+                window.onbeforeunload = () => {
                     var gameObjectName = 'Database Manager';
                     var unityObject = gameInstance.Module.cwrap('UnityObject', 'number', []);
 
-                    if (gameInstance && unityObject && gameInstance.Module.UTF8ToString(unityObject) === gameObjectName) {
-                        gameInstance.SendMessage(gameObjectName, 'CloseTab');
+                    if (unityInstance && unityObject && gameInstance.Module.UTF8ToString(unityObject) === gameObjectName) {
+                        unityInstance.SendMessage(gameObjectName, 'CloseTab');
                     } else {
                         console.warn('GameObject does not exist or is not yet initialized.');
                     }
-                });
+
+                    // Return a message to trigger a confirmation dialog (optional)
+                    return "Are you sure you want to leave the game? All changes will be saved.";
+                };
             });
             window.addEventListener('resize', onResize);
             onResize();
