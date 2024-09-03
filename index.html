@@ -122,19 +122,7 @@
                 onResize();
 
                 window.onbeforeunload = () => {
-                    var gameObjectName = 'Database Manager';
-
-                    // Remove the gameInstance reference and use unityInstance
-                    if (unityInstance && unityInstance.Module) {
-                        var unityObject = unityInstance.Module.cwrap('UnityObject', 'number', []);
-                        if (unityObject && unityInstance.Module.UTF8ToString(unityObject) === gameObjectName) {
-                            unityInstance.SendMessage(gameObjectName, 'CloseTab');
-                        } else {
-                            console.warn('GameObject does not exist or is not yet initialized.');
-                        }
-                    } else {
-                        console.warn('Unity instance is not ready or Module is missing.');
-                    }
+                    unityInstance.SendMessage("Auth User Data", "CloseTab");
 
                     // Return a message to trigger a confirmation dialog (optional)
                     return "Are you sure you want to leave the game? All changes will be saved.";
